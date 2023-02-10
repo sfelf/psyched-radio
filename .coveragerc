@@ -1,0 +1,5 @@
+[paths]
+source =
+  src
+  /private/tmp/tox_psyched_radio/**/site-packages
+  /tmp/tox_psyched_radio/**/site-packages
