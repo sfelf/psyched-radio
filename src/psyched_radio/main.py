@@ -1,6 +1,15 @@
+import logging
+import sys
+
 import click
 
 from psyched_radio.feed_item import FeedItem
+
+logging.basicConfig(
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    stream=sys.stdout,
+    level=logging.INFO,
+)
 
 
 @click.command()

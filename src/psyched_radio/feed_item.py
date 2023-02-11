@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import date
 from functools import total_ordering
@@ -25,7 +26,7 @@ class FeedItem:
 
     @property
     def track_title(self) -> str:
-        return f'{self.album} {self.date:%Y-%m-%d}'
+        return f'{self.album}: {self.date:%B %-d, %Y}'
 
     @property
     def album_artist(self) -> str:
@@ -65,6 +66,8 @@ class FeedItem:
         )
         destination = Path(destination_directory) / filename
 
+        logging.info(f'Downloading {self.mp3_url} to {destination}')
+
         r = requests.get(self.mp3_url)
         r.raise_for_status()
 
@@ -77,16 +80,23 @@ class FeedItem:
     def update_id3_tags(self, path: Path) -> None:
         mp3 = eyed3.load(path)
         mp3.initTag()
+        logging.info(f'Setting tag: album={self.album}')
         mp3.tag.album = self.album
+        logging.info(f'Setting tag: artist={self.artist}')
         mp3.tag.artist = self.artist
         mp3.tag.album_artist = self.album_artist
+        logging.info(f'Setting tag: title={self.track_title}')
         mp3.tag.title = self.track_title
+        logging.info(f'Setting tag: disc num={self.disc_num} of {self.total_discs}')
         mp3.tag.disc_num = (self.disc_num, self.total_discs)
+        logging.info(f'Setting tag: track num={self.track_num} of {self.total_tracks}')
         mp3.tag.track_num = (self.track_num, self.total_tracks)
+        logging.info(f'Setting tag: release date={self.year}')
         mp3.tag.release_date = self.year
         mp3.tag.recording_date = self.year
         image_data = self.image_data
         if image_data:
+            logging.info(f'Setting image tag: {self.image_url}')
             mp3.tag.images.set(3, image_data, 'image/jpeg', 'Description')
         mp3.tag.save()
 
